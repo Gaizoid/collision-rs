@@ -2,8 +2,8 @@ use std::time::{SystemTime, UNIX_EPOCH};
 
 #[derive(Debug)]
 pub struct Circle {
-  pos: (f32, f32),
-  r: f32,
+  pub pos: (f32, f32),
+  pub r: f32,
 }
 
 impl Circle {
