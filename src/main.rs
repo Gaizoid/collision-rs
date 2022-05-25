@@ -1,8 +1,14 @@
+use collision_rs::{check_collisions_circle, Circle};
+
 use ggez::{Context, ContextBuilder, GameResult};
 use ggez::graphics::{self, Color};
 use ggez::event::{self, EventHandler};
 
 fn main() {
+  // println!(check_collisions_circle(
+  //   // vec![co]
+  // ))
+
   // Make a Context.
   let (mut ctx, event_loop) = ContextBuilder::new("my_game", "Cool Game Author")
     .build()
