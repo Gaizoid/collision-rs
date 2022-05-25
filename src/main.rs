@@ -5,9 +5,9 @@ use ggez::graphics::{self, Color};
 use ggez::event::{self, EventHandler};
 
 fn main() {
-  // println!(check_collisions_circle(
-  //   // vec![co]
-  // ))
+  println!(check_collisions_circle(
+    vec![Circle::new((1.0, 2.0), 3.0)]
+  ));
 
   // Make a Context.
   let (mut ctx, event_loop) = ContextBuilder::new("my_game", "Cool Game Author")
