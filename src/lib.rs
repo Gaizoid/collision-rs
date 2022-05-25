@@ -61,3 +61,9 @@ pub fn fast_rand() -> f32 {
 
     return (rand-int_portion) as f32;
 }
+
+pub fn fast_rand_range(min: i32, max: i32) -> i32 {
+    let rand = fast_rand();
+    let integer_portion = (((max-min) as f32)*rand) as i32;
+    integer_portion + min
+}
