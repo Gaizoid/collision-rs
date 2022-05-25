@@ -1,3 +1,5 @@
+use std::time::{SystemTime, UNIX_EPOCH};
+
 #[derive(Debug)]
 pub struct Circle {
   pos: (f32, f32),
@@ -42,4 +44,20 @@ pub fn check_collisions_circle(circles: Vec<Circle>) -> Vec<(usize, usize)> {
     }
   }
   collisions
+}
+
+/// ### Fast rand Randomly generates a value between 0 and 1 where [0, 1)
+pub fn fast_rand() -> f32 {
+    let sqrt2: f32 = 1.41421356237; 
+    let time = SystemTime::now();
+
+    let since_the_epoch = time
+        .duration_since(UNIX_EPOCH)
+        .expect("Time went backwards");
+    let time = since_the_epoch.subsec_nanos() as u64;
+    
+    let rand = (time as f64)/(sqrt2 as f64);
+    let int_portion = rand.floor();
+
+    return (rand-int_portion) as f32;
 }
