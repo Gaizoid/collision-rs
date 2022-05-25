@@ -1,20 +1,30 @@
-use collision_rs::{check_collisions_circle, Circle};
+use collision_rs::{check_collisions_circle, Circle, fast_rand_range};
 use image::{ ImageBuffer, Rgb };
 
 fn main() {
+  let width = 1280u32;
+  let height = 720u32;
+
   let mut circles: Vec<Circle> = Vec::new();
-  circles.push(Circle::new((500.0, 200.0), 30.0));
-  circles.push(Circle::new((200.0, 300.0), 69.0));
-  circles.push(Circle::new((900.0, 400.0), 30.0));
-  circles.push(Circle::new((900.0, 430.0), 30.0));
-  circles_image(&circles);
+  for i in 0..5 {
+      circles.push(
+        Circle::new(
+            (
+                fast_rand_range(90, width-90) as f32,
+                fast_rand_range(90, height-90) as f32
+            ),
+            fast_rand_range(20, 90) as f32
+        )
+      );
+  }
+  circles_image(&circles, width, height);
   println!("{:?}", check_collisions_circle(
     circles
   ));
 }
 
-fn circles_image(circles: &Vec<Circle>) {
-  let mut img_buf: ImageBuffer<Rgb<u8>, Vec<u8>> = ImageBuffer::new(1280, 720);
+fn circles_image(circles: &Vec<Circle>, width: u32, height: u32) {
+  let mut img_buf: ImageBuffer<Rgb<u8>, Vec<u8>> = ImageBuffer::new(width, height);
   for (x, y, pixel) in img_buf.enumerate_pixels_mut() {
     for circle in circles {
       if
