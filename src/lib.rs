@@ -28,17 +28,22 @@ fn smooth_step(edge0: f32, edge1: f32, x: f32) -> f32 {
 
   let x = (x - edge0) / (edge1 - edge0);
 
-  x * x * (3.0 - 2.0 * x)
+  pow(x, 2.0) * (3.0 - 2.0 * x)
 }
 
 fn check_col_c_c(c1: &Circle, c2: &Circle) -> bool {
-  fast_dist(c1.pos.0, c1.pos.1, c2.pos.0, c2.pos.1) < (c1.r + c2.r) * (c1.r + c2.r)
+  fast_dist(
+      c1.pos.0, 
+      c1.pos.1, 
+      c2.pos.0, 
+      c2.pos.1
+    ) < pow(c1.r + c2.r, 2.0)
 }
 
 pub fn check_collisions_circle(circles: Vec<Circle>) -> Vec<(usize, usize)> {
   let mut collisions: Vec<(usize, usize)> = Vec::new();
   for (i, c1) in circles.iter().enumerate() {
-    for (j, c2) in circles.iter().enumerate() {
+    for (j, c2) in circles[i..circles.len()].iter().enumerate() {
       if i == j { continue; }
       if check_col_c_c(c1, c2) && i < j {
         collisions.push((i, j))
@@ -68,4 +73,8 @@ pub fn fast_rand_range(min: i32, max: i32) -> i32 {
     let rand = fast_rand();
     let integer_portion = (((max-min) as f32)*rand) as i32;
     integer_portion + min
+}
+
+fn pow(x: f32, y: f32) -> f32 {
+  x.powf(y)
 }
