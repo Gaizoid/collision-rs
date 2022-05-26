@@ -125,7 +125,7 @@ mod tests {
         // expected values and indices
         let ans: Vec<(usize, usize)> = vec![(5, 6), (6, 7), (6, 8), (7, 8), (7, 9), (8, 9)];
 
-        let width = 1280 as f32;
+      let width = 1280 as f32;
         let height = 720 as f32;
 
         let max_radius = 200.0;
