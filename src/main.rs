@@ -1,37 +1,49 @@
-use collision_rs::{check_collisions_circle, Circle, fast_rand_range};
+use collision_rs::{check_collisions_circle, Circle, smooth_step};
 use image::{ ImageBuffer, Rgb };
 
 fn main() {
-  let width = 1280u32;
-  let height = 720u32;
+  let width = 1280 as f32;
+  let height = 720 as f32;
 
-  let max_radius = 90;
-  let circles_count = 5;
+  let max_radius = 200.0;
+  let circles_count = 10;
 
   let mut circles: Vec<Circle> = Vec::new();
-  for _i in 0..circles_count {
-      circles.push(
-        Circle::new(
-            // Random position vector
-            (
-                fast_rand_range(max_radius, (width as i32)-max_radius) as f32,
-                fast_rand_range(max_radius, (height as i32)-max_radius) as f32
-            ),
-            // Random radius
-            fast_rand_range(20, max_radius) as f32,
-            // Random color
-            (
-                fast_rand_range(0, 255) as u8,
-                fast_rand_range(0, 255) as u8,
-                fast_rand_range(0, 255) as u8
-            )
+  for i in 0..circles_count {
+    let i_float = i as f32;
+    let circle_float = circles_count as f32;
+    // position is from [0, 1)
+    let position = i_float/circle_float;
+    let inverse_position = 1.0 - position;
+
+    // make sure circles are smaller than the next
+    let radius = position * max_radius;
+    
+    circles.push(
+      Circle::new(
+        // Random position vector
+        (
+          position*(width-2.0*radius)+radius,
+          height*smooth_step(max_radius, height-max_radius, position*(height-2.0*radius)+radius)
+        ),
+        // Random radius
+        radius,
+        // Random color
+        (
+          0u8,
+          (100.0 + position * 155.0) as u8,
+          (100.0 + inverse_position * 155.0) as u8,
         )
-      );
+      )
+    );
   }
-  circles_image(&circles, width, height);
-  println!("{:?}", check_collisions_circle(
-    circles
-  ));
+
+  // DEBUG OUTPUT
+  let collided_circles = check_collisions_circle(
+    &circles
+  );
+  circles_image(&circles, width as u32, height as u32);
+  println!("{:?}", collided_circles);
 }
 
 fn circles_image(circles: &Vec<Circle>, width: u32, height: u32) {
