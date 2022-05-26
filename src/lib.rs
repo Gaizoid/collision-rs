@@ -4,13 +4,15 @@ use std::time::{SystemTime, UNIX_EPOCH};
 pub struct Circle {
   pub pos: (f32, f32),
   pub r: f32,
+  pub color: (u8, u8, u8),
 }
 
 impl Circle {
-  pub fn new(pos: (f32, f32), r: f32) -> Circle {
+  pub fn new(pos: (f32, f32), r: f32, color: (u8, u8, u8)) -> Circle {
     Circle {
       pos,
-      r
+      r,
+      color,
     }
   }
 }
