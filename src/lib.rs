@@ -73,3 +73,146 @@ pub fn fast_rand_range(min: i32, max: i32) -> i32 {
     let integer_portion = (((max-min) as f32)*rand) as i32;
     integer_portion + min
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn fast_dist_test() {
+        assert_eq!(fast_dist(0.0, 0.0, 0.0, 0.0), 0.0);
+        assert_eq!(fast_dist(0.0, 0.0, 0.0, 1.0), 1.0);
+        assert_eq!(fast_dist(0.0, 0.0, 1.0, 0.0), 1.0);
+        assert_eq!(fast_dist(0.0, 0.0, 1.0, 1.0), 2.0);
+        assert_eq!(fast_dist(0.0, 1.0, 0.0, 0.0), 1.0);
+        assert_eq!(fast_dist(0.0, 1.0, 0.0, 1.0), 0.0);
+        assert_eq!(fast_dist(0.0, 1.0, 1.0, 0.0), 2.0);
+        assert_eq!(fast_dist(0.0, 1.0, 1.0, 1.0), 1.0);
+        assert_eq!(fast_dist(1.0, 0.0, 0.0, 0.0), 1.0);
+        assert_eq!(fast_dist(1.0, 0.0, 0.0, 1.0), 2.0);
+        assert_eq!(fast_dist(1.0, 0.0, 1.0, 0.0), 0.0);
+        assert_eq!(fast_dist(1.0, 0.0, 1.0, 1.0), 1.0);
+        assert_eq!(fast_dist(1.0, 1.0, 0.0, 0.0), 2.0);
+        assert_eq!(fast_dist(1.0, 1.0, 0.0, 1.0), 1.0);
+        assert_eq!(fast_dist(1.0, 1.0, 1.0, 0.0), 1.0);
+        assert_eq!(fast_dist(1.0, 1.0, 1.0, 1.0), 0.0);
+    }
+
+    #[test]
+    fn check_collisions_circle_test() {
+        // expected values and indicies
+        let ans: Vec<(usize, usize)> = vec![
+            (5, 6), (6, 7), (6, 8), (7, 8), (7, 9), (8, 9)
+        ];
+
+        let width = 1280 as f32;
+        let height = 720 as f32;
+
+        let max_radius = 200.0;
+        let circles_count = 10;
+
+        let mut circles: Vec<Circle> = Vec::new();
+        for i in 0..circles_count {
+            let i_float = i as f32;
+            let circle_float = circles_count as f32;
+            // position is from [0, 1)
+            let position = i_float/circle_float;
+            let inverse_position = 1.0 - position;
+
+            // make sure circles are smaller than the next
+            let radius = position * max_radius;
+            
+            circles.push(
+            Circle::new(
+                // Random position vector
+                (
+                position*(width-2.0*radius)+radius,
+                height*smooth_step(max_radius, height-max_radius, position*(height-2.0*radius)+radius)
+                ),
+                // Random radius
+                radius,
+                // Random color
+                (
+                0u8,
+                (100.0 + position * 155.0) as u8,
+                (100.0 + inverse_position * 155.0) as u8,
+                )
+            )
+            );
+        }
+
+        // DEBUG OUTPUT
+        let collided_circles = check_collisions_circle(
+            &circles
+        );
+
+        assert_eq!(collided_circles, ans)
+    }
+
+    #[test]
+    fn fast_rand_range_test() {
+        let min = 0;
+        let max = 10;
+        for _ in 0..100 {
+            let rand = fast_rand_range(min, max);
+            assert!(rand >= min && rand < max);
+        }
+
+        let min = -10;
+        let max = 20;
+        for _ in 0..100 {
+            let rand = fast_rand_range(min, max);
+            assert!(rand >= min && rand < max);
+        }
+
+        let min = 50;
+        let max = 51;
+        for _ in 0..100 {
+            let rand = fast_rand_range(min, max);
+            assert!(rand >= min && rand < max);
+        }
+    }
+
+    #[test]
+    fn check_col_c_c_test() {
+        let circle_xy: Vec<(i8, i8, i8, i8)> = vec![
+            (10, 10, 20, 20),
+            (5, 5, 2, 2),
+            (-10, -10, -15, -15)
+        ];
+        let circle_r: Vec<(i8, i8)> = vec![
+            (5, 5),
+            (4, 2),
+            (30, 5)
+        ];
+        let should_collide: Vec<bool> = vec![
+            false,
+            true,
+            true
+        ];
+
+        assert!(
+            circle_r.len() == circle_xy.len() &&
+            circle_r.len() == should_collide.len()
+        );
+
+        for (i, (x1, y1, x2, y2)) in circle_xy.iter().enumerate() {
+            let (r1, r2) = circle_r[i];
+
+            let c1 = Circle::new(
+                (*x1 as f32, *y1 as f32),
+                r1 as f32,
+                (0, 0, 0)
+            );
+            let c2 = Circle::new(
+                (*x2 as f32, *y2 as f32),
+                r2 as f32,
+                (0, 0, 0)
+            );
+            assert_eq!(
+                check_col_c_c(&c1, &c2),
+                should_collide[i]
+            );
+        }
+    }
+}
