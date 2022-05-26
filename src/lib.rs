@@ -21,14 +21,14 @@ fn fast_dist(x1: f32, y1: f32, x2: f32, y2: f32) -> f32 {
   (x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2)
 }
 
-#[allow(dead_code)]
-fn smooth_step(edge0: f32, edge1: f32, x: f32) -> f32 {
+pub fn smooth_step(edge0: f32, edge1: f32, x: f32) -> f32 {
   if x < edge0 { return 0f32; }
   if x > edge1 { return 1f32; }
 
   let x = (x - edge0) / (edge1 - edge0);
 
-  pow(x, 2.0) * (3.0 - 2.0 * x)
+//   x * x * (3.0 - 2.0 * x)
+   x * x * (3.0 - 2.0 * x)
 }
 
 fn check_col_c_c(c1: &Circle, c2: &Circle) -> bool {
@@ -37,16 +37,15 @@ fn check_col_c_c(c1: &Circle, c2: &Circle) -> bool {
       c1.pos.1, 
       c2.pos.0, 
       c2.pos.1
-    ) < pow(c1.r + c2.r, 2.0)
+    ) < (c1.r + c2.r) * (c1.r + c2.r)
 }
 
-pub fn check_collisions_circle(circles: Vec<Circle>) -> Vec<(usize, usize)> {
+pub fn check_collisions_circle(circles: &Vec<Circle>) -> Vec<(usize, usize)> {
   let mut collisions: Vec<(usize, usize)> = Vec::new();
   for (i, c1) in circles.iter().enumerate() {
-    for (j, c2) in circles[i..circles.len()].iter().enumerate() {
-      if i == j { continue; }
-      if check_col_c_c(c1, c2) && i < j {
-        collisions.push((i, j))
+    for (j, c2) in circles.iter().enumerate() {
+      if i < j && check_col_c_c(c1, c2) {
+        collisions.push((i, j));
       }
     }
   }
@@ -73,8 +72,4 @@ pub fn fast_rand_range(min: i32, max: i32) -> i32 {
     let rand = fast_rand();
     let integer_portion = (((max-min) as f32)*rand) as i32;
     integer_portion + min
-}
-
-fn pow(x: f32, y: f32) -> f32 {
-  x.powf(y)
 }
